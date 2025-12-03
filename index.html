@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles/style.css" />
+    <script type="module" src="./scripts/main.js"></script>
+    <!-- TradingView Lightweight Charts Library -->
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    <title>Investor Insights Dashboard</title>
+    
+    <style>
+      /* Compact Stock Watchlist */
+      .stock-watchlist-mini {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 12px;
+        box-sizing: border-box;
+      }
+      
+      .watchlist-search-mini {
+        display: flex;
+        gap: 6px;
+      }
+      
+      .watchlist-search-mini input {
+        flex: 1;
+        padding: 6px 8px;
+        border: 1px solid #333;
+        border-radius: 4px;
+        background: #2a2a2a;
+        color: #fff;
+        font-size: 12px;
+        text-transform: uppercase;
+      }
+      
+      .watchlist-search-mini input:focus {
+        outline: none;
+        border-color: #4a9eff;
+      }
+      
+      .watchlist-search-mini button {
+        width: 32px;
+        padding: 6px;
+        background: #4a9eff;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      
+      .watchlist-search-mini button:hover {
+        background: #3a8eef;
+      }
+      
+      .watchlist-stocks-mini {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        min-height: 32px;
+      }
+      
+      .watchlist-stock-mini {
+        padding: 4px 8px;
+        background: #2a2a2a;
+        border: 1px solid #333;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 11px;
+        font-weight: 600;
+        transition: all 0.2s;
+      }
+      
+      .watchlist-stock-mini:hover {
+        border-color: #4a9eff;
+        background: #333;
+      }
+      
+      .watchlist-stock-mini.active {
+        border-color: #4a9eff;
+        background: #1a3a5f;
+      }
+      
+      .stock-chart-mini {
+        flex: 1;
+        background: #2a2a2a;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+        font-size: 11px;
+        min-height: 200px;
+      }
+      
+      .error-mini {
+        background: #ff4444;
+        color: #fff;
+        padding: 6px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="top-nav">
+      <div class="brand">[w]</div>
+      <nav class="nav-links" aria-label="Primary">
+        <button class="nav-link is-active" type="button">Home</button>
+        <button class="nav-link" type="button">News</button>
+        <button class="nav-link" type="button">Crypto</button>
+      </nav>
+    </header>
+
+    <main class="page">
+      <section class="strip strip--stocks">
+        <div class="stock-buttons" aria-label="Stock buttons">
+          <button class="stock-button" data-symbol="AAPL">Stock</button>
+          <button class="stock-button" data-symbol="SPY">Stock</button>
+          <button class="stock-button" data-symbol="BTC">Stock</button>
+        </div>
+      </section>
+
+      <section class="hero">
+        <div class="chart-card" data-role="primary-chart">
+          <div class="chart-card__header">
+            <span class="chart-card__symbol" data-binding="primary-symbol">AAPL</span>
+            <span class="chart-card__range" data-binding="primary-range">1 day</span>
+          </div>
+          <div class="chart-card__canvas" aria-label="Price chart" data-binding="chart-placeholder">
+            <!-- Stock Market Watchlist Component (Compact) -->
+            <div class="stock-watchlist-mini">
+              <div class="watchlist-search-mini">
+                <input 
+                  type="text" 
+                  id="stockTickerInput" 
+                  placeholder="Ticker..."
+                  maxlength="10"
+                />
+                <button id="addToWatchlistBtn">+</button>
+              </div>
+              
+              <div id="watchlistStocks" class="watchlist-stocks-mini"></div>
+              
+              <div id="stockChartContainer" class="stock-chart-mini"></div>
+              
+              <div id="errorMessage" class="error-mini" style="display: none;"></div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="watchlist" aria-label="Watchlist" data-role="ticker-list">
+          <div class="watchlist__item" data-symbol="AAPL">
+            <span class="watchlist__label">Apple</span>
+            <span class="watchlist__value" data-binding="ticker-AAPL">--</span>
+          </div>
+          <div class="watchlist__item" data-symbol="SPY">
+            <span class="watchlist__label">S&amp;P 500</span>
+            <span class="watchlist__value" data-binding="ticker-SPY">--</span>
+          </div>
+          <div class="watchlist__item" data-symbol="BTC">
+            <span class="watchlist__label">Bitcoin</span>
+            <span class="watchlist__value" data-binding="ticker-BTC">--</span>
+          </div>
+          <button class="watchlist__add" type="button">+</button>
+        </aside>
+      </section>
+
+      <section class="news-section" aria-label="Latest news">
+        <h2 class="section-title">Latest news</h2>
+        <div class="news-grid" data-role="news-list">
+          <article class="news-card" data-symbol="AAPL">
+            <h3 class="news-card__title">Article</h3>
+            <p class="news-card__summary">placeholder summary</p>
+          </article>
+          <article class="news-card" data-symbol="SPY">
+            <h3 class="news-card__title">Article</h3>
+            <p class="news-card__summary">placeholder summary</p>
+          </article>
+          <article class="news-card" data-symbol="BTC">
+            <h3 class="news-card__title">Article</h3>
+            <p class="news-card__summary">placeholder summary</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="crypto-section" aria-label="Crypto">
+        <h2 class="section-title">Crypto</h2>
+        <div class="crypto-grid" data-role="crypto-list">
+          <div class="crypto-card">placeholder</div>
+          <div class="crypto-card">placeholder</div>
+          <div class="crypto-card">placeholder</div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">Footer</footer>
+
+    <script>
+      /**
+       * Compact Stock Watchlist Component
+       * Alpha Vantage API + TradingView Charts
+       * 
+       * Replace API key below with your free key from:
+       * https://www.alphavantage.co/support/#api-key
+       * 
+       * Free tier: 25 calls/day, 5 calls/minute
+       */
+
+      const ALPHA_VANTAGE_API_KEY = 'YOUR_ALPHA_VANTAGE_API_KEY';
+      const WATCHLIST_KEY = 'miniStockWatchlist';
+
+      const tickerInput = document.getElementById('stockTickerInput');
+      const addBtn = document.getElementById('addToWatchlistBtn');
+      const stocksList = document.getElementById('watchlistStocks');
+      const chartContainer = document.getElementById('stockChartContainer');
+      const errorMsg = document.getElementById('errorMessage');
+
+      let watchlist = JSON.parse(localStorage.getItem(WATCHLIST_KEY) || '[]');
+      let chart = null;
+      let activeTicker = null;
+
+      renderWatchlist();
+
+      function showError(msg) {
+        errorMsg.textContent = msg;
+        errorMsg.style.display = 'block';
+        setTimeout(() => errorMsg.style.display = 'none', 4000);
+      }
+
+      function addStock() {
+        const ticker = tickerInput.value.trim().toUpperCase();
+        if (!ticker) return showError('Enter a ticker');
+        if (watchlist.includes(ticker)) return showError('Already added');
+        
+        watchlist.push(ticker);
+        localStorage.setItem(WATCHLIST_KEY, JSON.stringify(watchlist));
+        renderWatchlist();
+        tickerInput.value = '';
+      }
+
+      function removeStock(ticker) {
+        watchlist = watchlist.filter(t => t !== ticker);
+        localStorage.setItem(WATCHLIST_KEY, JSON.stringify(watchlist));
+        renderWatchlist();
+        if (activeTicker === ticker) {
+          chartContainer.innerHTML = '<div style="color: #666; font-size: 11px;">Select stock</div>';
+          chart = null;
+          activeTicker = null;
+        }
+      }
+
+      function renderWatchlist() {
+        if (!watchlist.length) {
+          stocksList.innerHTML = '<div style="color: #666; font-size: 11px; padding: 8px;">Add stocks</div>';
+          return;
+        }
+        stocksList.innerHTML = watchlist.map(t => 
+          `<div class="watchlist-stock-mini ${t === activeTicker ? 'active' : ''}" 
+               onclick="loadChart('${t}')"
+               oncontextmenu="event.preventDefault(); removeStock('${t}');"
+               title="Click: chart | Right-click: remove">${t}</div>`
+        ).join('');
+      }
+
+      async function loadChart(ticker) {
+        activeTicker = ticker;
+        renderWatchlist();
+        chartContainer.innerHTML = '<div style="color: #666; font-size: 11px;">Loading...</div>';
+
+        try {
+          const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${ticker}&apikey=${ALPHA_VANTAGE_API_KEY}`;
+          const res = await fetch(url);
+          const data = await res.json();
+
+          if (data['Error Message']) throw new Error('Invalid ticker');
+          if (data['Note'] || data['Information']) throw new Error('API limit reached');
+          
+          const series = data['Time Series (Daily)'];
+          if (!series) throw new Error('No data');
+
+          const chartData = Object.entries(series)
+            .map(([date, vals]) => ({ time: date, value: parseFloat(vals['4. close']) }))
+            .sort((a, b) => new Date(a.time) - new Date(b.time));
+
+          chartContainer.innerHTML = '';
+          
+          chart = LightweightCharts.createChart(chartContainer, {
+            width: chartContainer.clientWidth,
+            height: chartContainer.clientHeight,
+            layout: { background: { color: '#2a2a2a' }, textColor: '#fff' },
+            grid: { vertLines: { color: '#333' }, horzLines: { color: '#333' } },
+            rightPriceScale: { borderColor: '#444' },
+            timeScale: { borderColor: '#444', timeVisible: true },
+          });
+
+          const lineSeries = chart.addAreaSeries({
+            topColor: 'rgba(74, 158, 255, 0.4)',
+            bottomColor: 'rgba(74, 158, 255, 0.0)',
+            lineColor: '#4a9eff',
+            lineWidth: 2,
+          });
+
+          lineSeries.setData(chartData);
+          chart.timeScale().fitContent();
+
+        } catch (err) {
+          chartContainer.innerHTML = '<div style="color: #ff4444; font-size: 11px;">Failed</div>';
+          showError(err.message);
+        }
+      }
+
+      addBtn.addEventListener('click', addStock);
+      tickerInput.addEventListener('keypress', e => e.key === 'Enter' && addStock());
+      
+      window.removeStock = removeStock;
+      window.loadChart = loadChart;
+    </script>
+  </body>
+</html>
